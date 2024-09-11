@@ -1,5 +1,6 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include "config.h"
 
 #define TEMP_PIN_1 18
 #define TEMP_PIN_2 19

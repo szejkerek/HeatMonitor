@@ -1,6 +1,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#include "config.h"
+#include "config.hpp"
+#include "peripherals.hpp"
 
 #define TEMP_PIN_1 18
 #define TEMP_PIN_2 19
@@ -50,8 +51,10 @@ void loop() {
   Serial.print("\n");
 
   buttonState = digitalRead(BUTTON_PIN);
+
   Serial.print("Button: ");
   Serial.print(buttonState);
+
   Serial.print("\n");
   if (buttonState == HIGH && lastButtonState == LOW) {
     diodeState = !diodeState;

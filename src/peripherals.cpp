@@ -18,7 +18,7 @@ void Peripherals::Setup()
     digitalWrite(LED_PIN, LOW);
 }
 
-float Peripherals::GetTemperature(int sensorID)
+float Peripherals::GetTemperature(int sensorID, bool log)
 {
     DallasTemperature tempSensor;
     switch (sensorID)
@@ -38,9 +38,20 @@ float Peripherals::GetTemperature(int sensorID)
         return 0.0f;
     }
 
-    tempSensor.requestTemperatures();
-    float temperature = tempSensor.getTempCByIndex(0);
-    Serial.print("Temperature " + String(sensorID) + ": " + String(temperature) + " ");
+    float temperature = 0;
+    for (size_t i = 0; i < 5; i++)
+    {
+        tempSensor.requestTemperatures();
+        temperature = tempSensor.getTempCByIndex(0);
+
+        if(temperature != -127 && temperature != 85)
+            continue;
+    }
+    
+    if(log)
+    {
+        Serial.print("Temperature " + String(sensorID) + ": " + String(temperature) + " ");
+    }
 
     return temperature;
 }

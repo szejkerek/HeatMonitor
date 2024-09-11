@@ -23,7 +23,7 @@ DallasTemperature tempSensor3;
 
 public:
     void Setup();
-    float GetTemperature(int sensorID);
+    float GetTemperature(int sensorID, bool log = true);
 };
 
 #endif

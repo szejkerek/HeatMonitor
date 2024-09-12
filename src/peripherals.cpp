@@ -44,8 +44,8 @@ float Peripherals::GetTemperature(int sensorID, bool log)
         tempSensor.requestTemperatures();
         temperature = tempSensor.getTempCByIndex(0);
 
-        if(temperature != -127 && temperature != 85)
-            continue;
+        if(temperature >= -100 && temperature <= 60 && temperature != 0)
+            break;
     }
     
     if(log)

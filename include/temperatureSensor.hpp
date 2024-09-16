@@ -60,8 +60,9 @@ float TemperatureSensor::GetTemperature()
         sum += tempQueue.front();  
         tempQueue.pop();          
     }
+    
 
-    Serial.print("Temperature value: " + String(sum / 3.0) + " ");
+    Serial.print("Temperature value: " + String((float)validSeriesCount) + " ");
     return sum / (float)validSeriesCount;
 }
 

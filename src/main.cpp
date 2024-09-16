@@ -16,11 +16,11 @@ void loop() {
   peripherals.temperture1.RequestTemperature();
   peripherals.temperture1.GetTemperature();
 
-  peripherals.temperture2.RequestTemperature();
-  peripherals.temperture2.GetTemperature();
+  // peripherals.temperture2.RequestTemperature();
+  // peripherals.temperture2.GetTemperature();
 
-  peripherals.temperture3.RequestTemperature();
-  peripherals.temperture3.GetTemperature();
+  // peripherals.temperture3.RequestTemperature();
+  // peripherals.temperture3.GetTemperature();
 
   Serial.print("\n");
   delay(3000);

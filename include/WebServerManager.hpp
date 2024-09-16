@@ -74,7 +74,7 @@ class WebServerManager {
 
     static String processor(const String& var, Peripherals* peripherals) {
       if (var == "TEMPERATURE") {
-        float t = peripherals->GetTemperature(0, false);
+        float t = peripherals->temperture1.GetTemperature();
         if (isnan(t)) {    
           return "--";
         } else {
@@ -85,7 +85,7 @@ class WebServerManager {
     }
 
     static String readDHTTemperature(Peripherals* peripherals) {
-      float t = peripherals->GetTemperature(0, false);
+      float t = peripherals->temperture1.GetTemperature();
       if (isnan(t)) {
         Serial.println("Failed to read from DHT sensor!");
         return "--";

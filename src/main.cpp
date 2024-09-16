@@ -1,8 +1,5 @@
-#include <OneWire.h>
-#include <DallasTemperature.h>
-#include <WebServerManager.hpp>
 #include "peripherals.hpp"
-#include "WiFi.h"
+#include "WebServerManager.hpp"
 
 Peripherals peripherals;          // Create peripherals object
 WebServerManager webServer(&peripherals);  // Pass peripherals to the WebServerManager
@@ -13,6 +10,8 @@ void setup() {
 }
 
 void loop() {
+  webServer.checkInternetConnection();
+
   peripherals.temperture1.RequestTemperature();
   peripherals.temperture1.GetTemperature();
 

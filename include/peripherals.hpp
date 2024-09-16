@@ -25,6 +25,11 @@ public:
         pinMode(LED_PIN, OUTPUT);
         digitalWrite(LED_PIN, LOW); 
     }
+
+    void SetDiodeState(bool turnOn)
+    {
+        turnOn ? digitalWrite(LED_PIN, HIGH) : digitalWrite(LED_PIN, LOW);
+    }
 };
 
 #endif

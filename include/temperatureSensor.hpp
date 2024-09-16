@@ -1,5 +1,6 @@
 #ifndef TEMPERATURE_SENSOR_H
 #define TEMPERATURE_SENSOR_H
+
 #include <queue>
 #include <OneWire.h>
 #include <DallasTemperature.h>
@@ -12,16 +13,14 @@ class TemperatureSensor
     DallasTemperature tempSensor;    
 
 public:
-    TemperatureSensor(int pinID);    
+    TemperatureSensor(int pinID) : oneWire(pinID), tempSensor(&oneWire) 
+    {
+        tempSensor.begin(); 
+    }    
+
     void RequestTemperature();       
     float GetTemperature();          
 };
-
-TemperatureSensor::TemperatureSensor(int pinID)
-    : oneWire(pinID), tempSensor(&oneWire)
-{
-    tempSensor.begin(); 
-}
 
 inline void TemperatureSensor::RequestTemperature()
 {
@@ -34,8 +33,6 @@ inline void TemperatureSensor::RequestTemperature()
         if (temperature >= -100 && temperature <= 60 && temperature != 0)
             break;
     }
-    
-    Serial.print("Temperature request: " + String(temperature) + " ");
 
     tempReadings.push(temperature);
 
@@ -43,7 +40,7 @@ inline void TemperatureSensor::RequestTemperature()
         tempReadings.pop();
 }
 
-float TemperatureSensor::GetTemperature()
+inline float TemperatureSensor::GetTemperature()
 {
     if (tempReadings.size() < validSeriesCount)
     {
@@ -62,7 +59,7 @@ float TemperatureSensor::GetTemperature()
     }
     
 
-    Serial.print("Temperature value: " + String((float)validSeriesCount) + " ");
+    Serial.print("Temperature value: " + String(sum / (float)validSeriesCount) + " ");
     return sum / (float)validSeriesCount;
 }
 

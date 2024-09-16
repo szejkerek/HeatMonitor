@@ -8,15 +8,21 @@
 
 class WebServerManager {
   private:
+    unsigned long previousMillis = 0;
+    const long interval = 15000;
+
     AsyncWebServer server;
     Peripherals* peripherals;
 
     static String processor(const String& var, Peripherals* peripherals) {
       if (var == "TEMPERATURE") {
         float t = peripherals->temperture1.GetTemperature();
-        if (isnan(t)) {    
+        if (isnan(t)) 
+        {    
           return "--";
-        } else {
+        } 
+        else 
+        {
           return String(t);
         }
       }
@@ -25,35 +31,33 @@ class WebServerManager {
 
     static String readDHTTemperature(Peripherals* peripherals) {
       float t = peripherals->temperture1.GetTemperature();
-      if (isnan(t)) {
+      if (isnan(t)) 
+      {
         Serial.println("Failed to read from DHT sensor!");
         return "--";
-      } else {
-        Serial.println(t);
+      } 
+      else
+      {
         return String(t);
       }
     }
 
   public:
-    WebServerManager(Peripherals* _peripherals) : server(80), peripherals(_peripherals) {}
-
-    void begin() 
+    WebServerManager(Peripherals* _peripherals) : server(80), peripherals(_peripherals) 
     {
-      // Initialize SPIFFS
       if(!SPIFFS.begin()){
         Serial.println("An error has occurred while mounting SPIFFS");
         return;
       }
       Serial.println("SPIFFS mounted successfully");
+    }
 
-      WiFi.begin(ssid, password);
-      while (WiFi.status() != WL_CONNECTED) {
-        delay(1000);
-        Serial.println("Connecting to WiFi...");
-      }
-      Serial.println(WiFi.localIP());
+    bool connectToWiFi();
+    void checkInternetConnection();
+    void begin() 
+    {
+      connectToWiFi();
 
-      // Serve static HTML, CSS, and JS files from SPIFFS
       server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         request->send(SPIFFS, "/index.html", String(), false);
       });

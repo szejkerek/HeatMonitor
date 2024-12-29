@@ -28,7 +28,7 @@ bool WebServerManager::connectToWiFi()
 {
     peripherals->SetDiodeState(true);
 
-    WiFi.begin(ssid, password);
+    // WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED)
     {
         Serial.print("\nConnecting to WiFi");

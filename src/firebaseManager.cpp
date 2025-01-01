@@ -12,14 +12,6 @@ FirebaseConfig config;
 unsigned long sendDataPrevMillis = 0;
 bool signupOK = false;
 
-String formatTimestamp(unsigned long timestamp) {
-  time_t rawTime = timestamp / 1000; // Convert milliseconds to seconds
-  struct tm *timeInfo = localtime(&rawTime); // Use localtime for the device's current time zone
-  char buffer[11]; // DD-MM-YYYY format
-  snprintf(buffer, sizeof(buffer), "%02d-%02d-%04d", timeInfo->tm_mday, timeInfo->tm_mon + 1, timeInfo->tm_year + 1900);
-  return String(buffer);
-}
-
 String FormatTime(const char* rawTime) {
     // Example input: "Wed Jan  1 18:22:34 2025"
     // Desired output: "2025-01-01 18:22:34"

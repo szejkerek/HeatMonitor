@@ -14,34 +14,110 @@ bool signupOK = false;
 
 String formatTimestamp(unsigned long timestamp) {
   time_t rawTime = timestamp / 1000; // Convert milliseconds to seconds
-  struct tm *timeInfo = gmtime(&rawTime);
+  struct tm *timeInfo = localtime(&rawTime); // Use localtime for the device's current time zone
   char buffer[11]; // DD-MM-YYYY format
   snprintf(buffer, sizeof(buffer), "%02d-%02d-%04d", timeInfo->tm_mday, timeInfo->tm_mon + 1, timeInfo->tm_year + 1900);
   return String(buffer);
 }
 
+String FormatTime(const char* rawTime) {
+    // Example input: "Wed Jan  1 18:22:34 2025"
+    // Desired output: "2025-01-01 18:22:34"
+    String formattedTime;
+    String months = "JanFebMarAprMayJunJulAugSepOctNovDec";
+
+    String rawString = String(rawTime);
+    String month = rawString.substring(4, 7); // Extract month
+    String day = rawString.substring(8, 10); // Extract day
+    String time = rawString.substring(11, 19); // Extract HH:MM:SS
+    String year = rawString.substring(20, 24); // Extract year
+
+    day.trim();
+    if (day.length() == 1) {
+        day = "0" + day;
+    }
+
+    int monthIndex = months.indexOf(month) / 3 + 1;
+    String monthNumber = monthIndex < 10 ? "0" + String(monthIndex) : String(monthIndex);
+    formattedTime = year + "-" + monthNumber + "-" + day + " " + time;
+    return formattedTime;
+}
+
+
+bool synchronizeTime()
+{
+    configTime(3600, 3600, "pool.ntp.org", "time.nist.gov");
+    Serial.println("Syncing time with NTP server...");
+    delay(3500);
+    for (int i = 0; i < 30; i++) {
+        time_t now = time(nullptr);
+        if (now > 100000) {
+        Serial.println("Time synchronized: " + FormatTime(ctime(&now)));
+        return true;
+        }
+        delay(500);
+    }
+
+    if (time(nullptr) <= 100000) {
+        Serial.println("\nFailed to synchronize time. Check NTP server or Wi-Fi.");
+    }
+    return false;
+}
+
 void setupFirebase(const String& apiKey, const String& databaseUrl) {
   Serial.println("Initializing Firebase...");
-
-  /* Assign the API key (required) */
   config.api_key = apiKey.c_str();
-
-  /* Assign the RTDB URL (required) */
   config.database_url = databaseUrl.c_str();
 
-  /* Sign up */
   if (Firebase.signUp(&config, &auth, "", "")) {
     Serial.println("Sign-up successful");
     signupOK = true;
   } else {
     Serial.printf("Error: %s\n", config.signer.signupError.message.c_str());
   }
-
-  /* Assign the callback function for the long running token generation task */
-  config.token_status_callback = tokenStatusCallback; // see addons/TokenHelper.h
+  config.token_status_callback = tokenStatusCallback;
 
   Firebase.begin(&config, &auth);
-  Firebase.reconnectWiFi(true);
+  Firebase.reconnectNetwork(true);
+
+  synchronizeTime();
+}
+
+
+bool setFloatValue(const String& path, float value) {
+  if (!Firebase.RTDB.setFloat(&fbdo, path.c_str(), value)) {
+    Serial.println("FAILED to write float value to: " + path);
+    Serial.println("REASON: " + fbdo.errorReason());
+    return false;
+  }
+  return true;
+}
+
+bool setIntValue(const String& path, int value) {
+  if (!Firebase.RTDB.setInt(&fbdo, path.c_str(), value)) {
+    Serial.println("FAILED to write int value to: " + path);
+    Serial.println("REASON: " + fbdo.errorReason());
+    return false;
+  }
+  return true;
+}
+
+bool setStringValue(const String& path, const String& value) {
+  if (!Firebase.RTDB.setString(&fbdo, path.c_str(), value)) {
+    Serial.println("FAILED to write string value to: " + path);
+    Serial.println("REASON: " + fbdo.errorReason());
+    return false;
+  }
+  return true;
+}
+
+bool setBoolValue(const String& path, bool value) {
+  if (!Firebase.RTDB.setBool(&fbdo, path.c_str(), value)) {
+    Serial.println("FAILED to write bool value to: " + path);
+    Serial.println("REASON: " + fbdo.errorReason());
+    return false;
+  }
+  return true;
 }
 
 bool saveDataToFirebase(const CustomData& data, unsigned long timestamp) {
@@ -53,19 +129,11 @@ bool saveDataToFirebase(const CustomData& data, unsigned long timestamp) {
   String formattedDate = formatTimestamp(timestamp);
   String basePath = "sensor_data/" + formattedDate + "/";
 
-  // Save temperature
-  String tempPath = basePath + "temperature";
-  if (!Firebase.RTDB.setFloat(&fbdo, tempPath.c_str(), data.temperature)) {
-    Serial.println("FAILED to write temperature data");
-    Serial.println("REASON: " + fbdo.errorReason());
+  if (!setFloatValue(basePath + "temperature", data.temperature)) {
     return false;
   }
 
-  // Save humidity
-  String humidityPath = basePath + "humidity";
-  if (!Firebase.RTDB.setFloat(&fbdo, humidityPath.c_str(), data.humidity)) {
-    Serial.println("FAILED to write humidity data");
-    Serial.println("REASON: " + fbdo.errorReason());
+  if (!setFloatValue(basePath + "humidity", data.humidity)) {
     return false;
   }
 

@@ -2,59 +2,9 @@
 #include "WebServerManager.hpp"
 #include <Arduino.h>
 #include <WiFi.h>
-#include <Firebase_ESP_Client.h>
-#include "addons/TokenHelper.h"
-#include "addons/RTDBHelper.h"
 
-#include <HTTPClient.h>
-#include <UrlEncode.h>
-
-
-// Define Firebase Data object
-FirebaseData fbdo;
-
-FirebaseAuth auth;
-FirebaseConfig config;
-
-unsigned long sendDataPrevMillis = 0;
-bool signupOK = false;
-
-void sendMessage(String message) {
-  // Data to send with HTTP POST
-  String url = "https://api.callmebot.com/whatsapp.php?phone=" + PHONE_NUMBER + "&apikey=" + WHATSAPP_KEY + "&text=" + urlEncode(message);
-  HTTPClient http;
-  bool messageSent = false; // Flag to check if the message was sent successfully
-  int maxRetries = 3;       // Maximum number of retries
-  int attempt = 0;          // Counter for the number of attempts
-
-  while (!messageSent && attempt < maxRetries) {
-    attempt++;
-    http.begin(url);
-
-    // Specify content-type header
-    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    // Send HTTP POST request
-    int httpResponseCode = http.POST(url);
-    if (httpResponseCode == 200) {
-      Serial.println("Message sent successfully");
-      messageSent = true;
-    } else {
-      Serial.println("Error sending the message");
-      Serial.print("HTTP response code: ");
-      Serial.println(httpResponseCode);
-      Serial.print("Retrying... Attempt ");
-      Serial.println(attempt);
-    }
-
-    // Free resources
-    http.end();
-  }
-
-  if (!messageSent) {
-    Serial.println("Failed to send the message after multiple attempts.");
-  }
-}
+#include "firebaseManager.hpp"
+#include "whatsappMessaging.hpp"
 
 void setup() {
   Serial.begin(9600);
@@ -67,61 +17,40 @@ void setup() {
   Serial.println();
   Serial.print("Connected with IP: ");
   Serial.println(WiFi.localIP());
-  Serial.println();
 
-  /* Assign the API key (required) */
-  config.api_key = API_KEY;
+  // Initialize Firebase
+  setupFirebase(API_KEY, DATABASE_URL);
 
-  /* Assign the RTDB URL (required) */
-  config.database_url = DATABASE_URL;
-
-  /* Sign up */
-  if (Firebase.signUp(&config, &auth, "", "")) {
-    Serial.println("Sign-up successful");
-    signupOK = true;
-  } else {
-    Serial.printf("Error: %s\n", config.signer.signupError.message.c_str());
-  }
-
-  /* Assign the callback function for the long running token generation task */
-  config.token_status_callback = tokenStatusCallback; // see addons/TokenHelper.h
-
-  Firebase.begin(&config, &auth);
-  Firebase.reconnectWiFi(true);
-
-  pinMode(34, INPUT_PULLUP); // Set button pin as input with pull-up
+  // Setup button pin
+  pinMode(34, INPUT_PULLUP);
 }
 
 void loop() {
-  if (digitalRead(34) == LOW) { // Check if the button is pressed
-    delay(50); // Debounce delay
-    if (digitalRead(34) == LOW) { // Confirm button press
-      sendMessage("Clicked"); // Send "Clicked" message
-      Serial.println("Button pressed, message sent.");
-      while (digitalRead(34) == LOW); // Wait for button release
+  static unsigned long lastSendTime = 0;
+  if (millis() - lastSendTime > 15000) {
+    lastSendTime = millis();
+
+    // Simulate sensor data
+    CustomData sensorData;
+    sensorData.temperature = 20.0 + random(0, 100) / 10.0; // Random temperature
+    sensorData.humidity = 30.0 + random(0, 100) / 10.0;     // Random humidity
+
+    unsigned long timestamp = millis();
+
+    if (saveDataToFirebase(sensorData, timestamp)) {
+      Serial.println("Data saved successfully.");
+    } else {
+      Serial.println("Failed to save data.");
     }
   }
 
-  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 15000 || sendDataPrevMillis == 0)) {
-    sendDataPrevMillis = millis();
-
-    // Simulate temperature data
-    float temperature = 20.0 + random(0, 100) / 10.0; // Random temperature for demonstration
-
-    // Get timestamp in milliseconds
-    unsigned long timestamp = millis(); 
-
-    // Construct database path
-    String path = "temperature_data/" + String(timestamp);
-
-    // Save temperature data to the database
-    if (Firebase.RTDB.setFloat(&fbdo, path, temperature)) {
-      Serial.println("Temperature data written to Firebase:");
-      Serial.println("Timestamp: " + String(timestamp));
-      Serial.println("Temperature: " + String(temperature));
-    } else {
-      Serial.println("FAILED to write data");
-      Serial.println("REASON: " + fbdo.errorReason());
+  // Handle button press
+  if (digitalRead(34) == LOW) {
+    delay(50); // Debounce
+    if (digitalRead(34) == LOW) {
+      sendMessage("Button clicked", PHONE_NUMBER, WHATSAPP_KEY);
+      Serial.println("Button clicked, message sent.");
+      while (digitalRead(34) == LOW);
     }
   }
 }

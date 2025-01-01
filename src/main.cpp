@@ -21,7 +21,7 @@ bool signupOK = false;
 
 void sendMessage(String message) {
   // Data to send with HTTP POST
-  String url = "https://api.callmebot.com/whatsapp.php?phone=" + phoneNumber + "&apikey=" + apiKey + "&text=" + urlEncode(message);
+  String url = "https://api.callmebot.com/whatsapp.php?phone=" + PHONE_NUMBER + "&apikey=" + WHATSAPP_KEY + "&text=" + urlEncode(message);
   HTTPClient http;
   bool messageSent = false; // Flag to check if the message was sent successfully
   int maxRetries = 3;       // Maximum number of retries

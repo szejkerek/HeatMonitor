@@ -1,31 +1,21 @@
-#include "peripherals.hpp"
 #include "config.hpp"
 #include <Arduino.h>
 #include <WiFi.h>
 
 #include "firebaseManager.hpp"
 #include "whatsappMessaging.hpp"
+#include "serviceManager.hpp"
+#include "peripherals.hpp"
 
 void setup() {
   Serial.begin(9600);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.print("Connecting to Wi-Fi");
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(300);
-  }
-  Serial.println();
-  Serial.print("Connected with IP: ");
-  Serial.println(WiFi.localIP());
-
-  // Initialize Firebase
-  setupFirebase(API_KEY, DATABASE_URL);
-
   // Setup button pin
-  pinMode(34, INPUT_PULLUP);
+  setupPeripherals();
 }
 
 void loop() {
+  checkConnectionAndTryReconnect();
+
   static unsigned long lastSendTime = 0;
   if (millis() - lastSendTime > 15000) {
     lastSendTime = millis();

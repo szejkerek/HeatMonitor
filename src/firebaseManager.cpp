@@ -14,7 +14,7 @@ bool signupOK = false;
 
 String FormatTime(const char* rawTime) {
     // Example input: "Wed Jan  1 18:22:34 2025"
-    // Desired output: "2025-01-01 18:22:34"
+    // Desired output: "2025-01-01_18:22:34"
     String formattedTime;
     String months = "JanFebMarAprMayJunJulAugSepOctNovDec";
 
@@ -31,7 +31,7 @@ String FormatTime(const char* rawTime) {
 
     int monthIndex = months.indexOf(month) / 3 + 1;
     String monthNumber = monthIndex < 10 ? "0" + String(monthIndex) : String(monthIndex);
-    formattedTime = year + "-" + monthNumber + "-" + day + " " + time;
+    formattedTime = year + "-" + monthNumber + "-" + day + "_" + time;
     return formattedTime;
 }
 

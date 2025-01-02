@@ -1,35 +1,27 @@
-#ifndef PERIPHERALS_H
-#define PERIPHERALS_H
+#pragma once
 
 #include "temperatureSensor.hpp"
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-class Peripherals
+const int TEMP_PIN_1 = 18;
+const int TEMP_PIN_2 = 19;
+const int TEMP_PIN_3 = 21;
+const int BUTTON_PIN = 34;
+const int LED_PIN = 13;
+
+// TemperatureSensor temperature1(TEMP_PIN_1);
+// TemperatureSensor temperature2(TEMP_PIN_2);
+// TemperatureSensor temperature3(TEMP_PIN_3);
+
+void setupPeripherals()
 {
-private:
-    const int TEMP_PIN_1 = 18;
-    const int TEMP_PIN_2 = 19;
-    const int TEMP_PIN_3 = 21;
-    const int BUTTON_PIN = 34;
-    const int LED_PIN = 13;
+    pinMode(BUTTON_PIN, INPUT_PULLUP); // Configure button pin
+    pinMode(LED_PIN, OUTPUT);          // Configure LED pin
+    digitalWrite(LED_PIN, LOW);        // Ensure LED is off initially
+}
 
-public:
-    TemperatureSensor temperture1;
-    TemperatureSensor temperture2;
-    TemperatureSensor temperture3;
-
-    Peripherals() : temperture1(TEMP_PIN_1), temperture2(TEMP_PIN_2), temperture3(TEMP_PIN_3)
-    {
-        pinMode(BUTTON_PIN, INPUT_PULLUP);
-        pinMode(LED_PIN, OUTPUT);
-        digitalWrite(LED_PIN, LOW);
-    }
-
-    void SetDiodeState(bool turnOn)
-    {
-        turnOn ? digitalWrite(LED_PIN, HIGH) : digitalWrite(LED_PIN, LOW);
-    }
-};
-
-#endif
+void SetDiodeState(bool turnOn)
+{
+    digitalWrite(LED_PIN, turnOn ? HIGH : LOW);
+}

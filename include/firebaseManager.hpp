@@ -3,8 +3,9 @@
 #include <Arduino.h>
 
 struct CustomData {
-  float temperature;
-  float humidity;
+  float temperature1;
+  float temperature2;
+  float temperature3;
 };
 
 String formatTimestamp(unsigned long timestamp);

@@ -1,16 +1,15 @@
-#include "peripherals.hpp"
-#include "config.hpp"
 #include <Arduino.h>
 #include <WiFi.h>
 
+#include "config.hpp"
+#include "peripherals.hpp"
+#include "serviceManager.hpp"
 #include "firebaseManager.hpp"
 #include "whatsappMessaging.hpp"
-#include "serviceManager.hpp"
 
 void setup() {
   Serial.begin(9600);
-  // Setup button pin
-  pinMode(34, INPUT_PULLUP);
+  setupPeripherals();
 }
 
 void loop() {
@@ -20,10 +19,10 @@ void loop() {
   if (millis() - lastSendTime > 15000) {
     lastSendTime = millis();
 
-    // Simulate sensor data
     CustomData sensorData;
-    sensorData.temperature = 20.0 + random(0, 100) / 10.0; // Random temperature
-    sensorData.humidity = 30.0 + random(0, 100) / 10.0;     // Random humidity
+    sensorData.temperature1 = temperature1.GetTemperature();
+    sensorData.temperature2 = temperature2.GetTemperature();
+    sensorData.temperature3 = temperature3.GetTemperature();
 
     unsigned long timestamp = millis();
 

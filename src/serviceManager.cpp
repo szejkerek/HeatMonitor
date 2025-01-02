@@ -10,7 +10,7 @@ void SetDiodeState(bool turnOn)
 bool checkConnectionAndTryReconnect()
 {
     static unsigned long lastRunTime = 0; // Static variable to keep track of last execution time
-    const unsigned long interval = 10000; // 10 seconds interval
+    const unsigned long interval = 60000; // 60 seconds interval
     unsigned long currentTime = millis();
 
     // If the interval hasn't passed, exit early

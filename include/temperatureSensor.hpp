@@ -7,10 +7,9 @@
 
 class TemperatureSensor
 {
-    const int validSeriesCount = 5;
-    std::queue<float> tempReadings;
     OneWire oneWire;
     DallasTemperature tempSensor;
+    unsigned long lastRequestTime;
 
 public:
     TemperatureSensor(int pinID);

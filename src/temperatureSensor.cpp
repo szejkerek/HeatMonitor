@@ -1,45 +1,35 @@
 #include "temperatureSensor.hpp"
 
-TemperatureSensor::TemperatureSensor(int pinID) : oneWire(pinID), tempSensor(&oneWire)
+TemperatureSensor::TemperatureSensor(int pinID) : oneWire(pinID), tempSensor(&oneWire), lastRequestTime(0)
 {
     tempSensor.begin();
 }
 
-void TemperatureSensor::RequestTemperature()
-{
-    float temperature = 0;
-    for (size_t i = 0; i < 5; i++)
-    {
-        tempSensor.requestTemperatures();
-        temperature = tempSensor.getTempCByIndex(0);
-
-        if (temperature >= -100 && temperature <= 60 && temperature != 0)
-            break;
-    }
-
-    tempReadings.push(temperature);
-
-    if (tempReadings.size() > validSeriesCount)
-        tempReadings.pop();
-}
-
 float TemperatureSensor::GetTemperature()
 {
-    if (tempReadings.size() < validSeriesCount)
+    unsigned long currentTime = millis();
+
+    // Ensure at least 2 seconds between readings
+    if (currentTime - lastRequestTime < 2000)
     {
-        Serial.println("Not enough temperature readings.");
+        Serial.println("Error: Reading requested too soon. Wait for 2 seconds.");
         return NAN;
     }
 
-    float sum = 0;
-    std::queue<float> tempQueue = tempReadings;
+    lastRequestTime = currentTime;
 
-    while (!tempQueue.empty())
+    tempSensor.requestTemperatures();
+    float temperature = tempSensor.getTempCByIndex(0);
+
+    // Validate reading
+    if (temperature > -55.0 && temperature < 125.0 && temperature != 85.0) // Adjust range for DS18B20
     {
-        sum += tempQueue.front();
-        tempQueue.pop();
+        Serial.println("Temperature value: " + String(temperature));
+        return temperature;
     }
-
-    Serial.println("Temperature value: " + String(sum / (float)validSeriesCount) + " ");
-    return sum / (float)validSeriesCount;
+    else
+    {
+        Serial.println("Error: Invalid temperature reading.");
+        return NAN;
+    }
 }

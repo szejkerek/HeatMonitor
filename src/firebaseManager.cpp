@@ -121,18 +121,16 @@ bool saveDataToFirebase(const CustomData& data, unsigned long timestamp) {
   String formattedDate = FormatTime(ctime(&now));
   String basePath = "sensor_data/" + formattedDate + "/";
 
-  if (!setFloatValue(basePath + "temperature", data.temperature)) {
+  if (!setFloatValue(basePath + "temperature1", data.temperature1)) {
+    return false;
+  }
+  if (!setFloatValue(basePath + "temperature2", data.temperature2)) {
+    return false;
+  }
+  if (!setFloatValue(basePath + "temperature3", data.temperature3)) {
     return false;
   }
 
-  if (!setFloatValue(basePath + "humidity", data.humidity)) {
-    return false;
-  }
-
-
-  Serial.println("Custom data written to Firebase:");
-  Serial.println("Date: " + formattedDate);
-  Serial.println("Temperature: " + String(data.temperature));
-  Serial.println("Humidity: " + String(data.humidity));
+  Serial.println("Data saved to firebase.");
   return true;
 }

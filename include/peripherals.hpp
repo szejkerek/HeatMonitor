@@ -18,7 +18,6 @@ void setupPeripherals()
     pinMode(BUTTON_PIN, INPUT_PULLUP); // Configure button pin
     pinMode(13, OUTPUT);          // Configure LED pin
     digitalWrite(13, LOW);        // Ensure LED is off initially
-    pinMode(34, INPUT_PULLUP);
 }
 
 

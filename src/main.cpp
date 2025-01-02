@@ -1,3 +1,4 @@
+#include "peripherals.hpp"
 #include "config.hpp"
 #include <Arduino.h>
 #include <WiFi.h>
@@ -5,17 +6,16 @@
 #include "firebaseManager.hpp"
 #include "whatsappMessaging.hpp"
 #include "serviceManager.hpp"
-#include "peripherals.hpp"
 
 void setup() {
   Serial.begin(9600);
   // Setup button pin
-  setupPeripherals();
+  pinMode(34, INPUT_PULLUP);
 }
 
 void loop() {
   checkConnectionAndTryReconnect();
-
+  
   static unsigned long lastSendTime = 0;
   if (millis() - lastSendTime > 15000) {
     lastSendTime = millis();

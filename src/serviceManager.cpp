@@ -9,15 +9,18 @@ void SetDiodeState(bool turnOn)
 
 bool checkConnectionAndTryReconnect()
 {
-    static unsigned long lastRunTime = 0; // Initialize to 0 for the first call
+    static unsigned long lastRunTime = 0; // Static variable to keep track of last execution time
     const unsigned long interval = 10000; // 10 seconds interval
     unsigned long currentTime = millis();
 
+    // If the interval hasn't passed, exit early
     if (currentTime - lastRunTime < interval) {
-        return true; 
+        return true; // Nothing to do yet
     }
 
+    // Update the last execution time
     lastRunTime = currentTime;
+
     Serial.println("Checking connection...");
 
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "temperatureSensor.hpp"
+#include "distanceSensor.hpp"
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
@@ -13,12 +14,16 @@ TemperatureSensor temperature1(TEMP_PIN_1);
 TemperatureSensor temperature2(TEMP_PIN_2);
 TemperatureSensor temperature3(TEMP_PIN_3);
 
+DistanceSensor distanceSensor;
+
 void setupPeripherals()
 {
     pinMode(BUTTON_PIN, INPUT_PULLUP); // Configure button pin
     pinMode(13, OUTPUT);          // Configure LED pin
     digitalWrite(13, LOW);        // Ensure LED is off initially
     pinMode(34, INPUT_PULLUP);
+
+    distanceSensor.Init();
 }
 
 

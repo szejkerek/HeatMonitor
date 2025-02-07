@@ -13,16 +13,14 @@ unsigned long sendDataPrevMillis = 0;
 bool signupOK = false;
 
 String FormatTime(const char* rawTime) {
-    // Example input: "Wed Jan  1 18:22:34 2025"
-    // Desired output: "2025-01-01_18:22:34"
     String formattedTime;
     String months = "JanFebMarAprMayJunJulAugSepOctNovDec";
 
     String rawString = String(rawTime);
-    String month = rawString.substring(4, 7); // Extract month
-    String day = rawString.substring(8, 10); // Extract day
-    String time = rawString.substring(11, 19); // Extract HH:MM:SS
-    String year = rawString.substring(20, 24); // Extract year
+    String month = rawString.substring(4, 7);
+    String day = rawString.substring(8, 10);
+    String time = rawString.substring(11, 19);
+    String year = rawString.substring(20, 24);
 
     day.trim();
     if (day.length() == 1) {
@@ -34,7 +32,6 @@ String FormatTime(const char* rawTime) {
     formattedTime = year + "-" + monthNumber + "-" + day + "_" + time;
     return formattedTime;
 }
-
 
 bool synchronizeTime()
 {
@@ -50,30 +47,31 @@ bool synchronizeTime()
         delay(500);
     }
 
-    if (time(nullptr) <= 100000) {
-        Serial.println("\nFailed to synchronize time. Check NTP server or Wi-Fi.");
-    }
+    Serial.println("\nFailed to synchronize time. Check NTP server or Wi-Fi.");
     return false;
 }
 
-void setupFirebase(const String& apiKey, const String& databaseUrl) {
+
+bool setupFirebase(const String& apiKey, const String& databaseUrl) {
   Serial.println("Initializing Firebase...");
   config.api_key = apiKey.c_str();
   config.database_url = databaseUrl.c_str();
 
   if (Firebase.signUp(&config, &auth, "", "")) {
     Serial.println("Sign-up successful");
-    signupOK = true;
   } else {
     Serial.printf("Error: %s\n", config.signer.signupError.message.c_str());
+    return false;
   }
-  config.token_status_callback = tokenStatusCallback;
 
+  config.token_status_callback = tokenStatusCallback;
   Firebase.begin(&config, &auth);
   Firebase.reconnectNetwork(true);
 
-  synchronizeTime();
+  return synchronizeTime();
 }
+
+
 
 
 bool setFloatValue(const String& path, float value) {
@@ -113,7 +111,7 @@ bool setBoolValue(const String& path, bool value) {
 }
 
 bool saveDataToFirebase(const CustomData& data, unsigned long timestamp) {
-  if (!Firebase.ready() || !signupOK) {
+  if (!Firebase.ready()) {
     Serial.println("Firebase not ready or signup failed.");
     return false;
   }

@@ -22,7 +22,7 @@ float TemperatureSensor::GetTemperature()
     float temperature = tempSensor.getTempCByIndex(0);
 
     // Validate reading
-    if (temperature > -55.0 && temperature < 125.0 && temperature != 85.0) // Adjust range for DS18B20
+    if (temperature > -40.0 && temperature < 115.0 && temperature != 85.0) // Adjust range for DS18B20
     {
         Serial.println("Temperature value: " + String(temperature));
         return temperature;
@@ -30,6 +30,6 @@ float TemperatureSensor::GetTemperature()
     else
     {
         Serial.println("Error: Invalid temperature reading.");
-        return NAN;
+        return 0.0f;
     }
 }

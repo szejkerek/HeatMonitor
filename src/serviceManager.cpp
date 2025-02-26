@@ -9,7 +9,6 @@ void SetDiodeState(bool turnOn)
 }
 
 
-
 bool checkConnectionAndTryReconnect() {
   static unsigned long lastRunTime = 0;
   const unsigned long interval = 10000; // Recheck connection every 10 seconds

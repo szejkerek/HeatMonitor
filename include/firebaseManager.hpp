@@ -6,6 +6,7 @@ struct CustomData {
   float temperature1;
   float temperature2;
   float temperature3;
+  float distance;
 };
 
 String formatTimestamp(unsigned long timestamp);

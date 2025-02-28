@@ -15,7 +15,7 @@ std::vector<float> temp3Readings;
 std::vector<float> distanceReadings;
 
 const size_t WINDOW_SIZE = 12; // Store last 12 readings (~1 min)
-const unsigned long READING_INTERVAL = 60000 / WINDOW_SIZE; // Adjusted reading interval
+const unsigned long READING_INTERVAL = 60000 / WINDOW_SIZE;
 unsigned long lastReadingTime = 0;
 unsigned long lastSendTime = 0;
 
@@ -30,7 +30,7 @@ float getMedian(std::vector<float>& values) {
 void addReading(std::vector<float>& readings, float newValue) {
   readings.push_back(newValue);
   if (readings.size() > WINDOW_SIZE) {
-    readings.erase(readings.begin()); // Maintain rolling window
+    readings.erase(readings.begin());
   }
 }
 
@@ -46,6 +46,9 @@ void setup() {
 }
 
 void loop() {
+  if(!checkConnectionAndTryReconnect())
+      return;
+  
   if (millis() - lastReadingTime > READING_INTERVAL) {
     lastReadingTime = millis();
     

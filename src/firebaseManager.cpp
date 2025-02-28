@@ -128,6 +128,9 @@ bool saveDataToFirebase(const CustomData& data, unsigned long timestamp) {
   if (!setFloatValue(basePath + "temperature3", data.temperature3)) {
     return false;
   }
+  if (!setFloatValue(basePath + "distance", data.distance)) {
+    return false;
+  }
 
   Serial.println("Data saved to firebase.");
   return true;

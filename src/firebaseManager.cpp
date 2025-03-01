@@ -12,6 +12,7 @@ FirebaseConfig config;
 unsigned long sendDataPrevMillis = 0;
 bool signupOK = false;
 
+
 String FormatTime(const char* rawTime) {
     String formattedTime;
     String months = "JanFebMarAprMayJunJulAugSepOctNovDec";

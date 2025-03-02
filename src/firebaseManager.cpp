@@ -12,7 +12,6 @@ FirebaseConfig config;
 unsigned long sendDataPrevMillis = 0;
 bool signupOK = false;
 
-
 String FormatTime(const char* rawTime) {
     String formattedTime;
     String months = "JanFebMarAprMayJunJulAugSepOctNovDec";
@@ -72,9 +71,6 @@ bool setupFirebase(const String& apiKey, const String& databaseUrl) {
   return synchronizeTime();
 }
 
-
-
-
 bool setFloatValue(const String& path, float value) {
   if (!Firebase.RTDB.setFloat(&fbdo, path.c_str(), value)) {
     Serial.println("FAILED to write float value to: " + path);
@@ -120,18 +116,12 @@ bool saveDataToFirebase(const CustomData& data, unsigned long timestamp) {
   String formattedDate = FormatTime(ctime(&now));
   String basePath = "sensor_data/" + formattedDate + "/";
 
-  if (!setFloatValue(basePath + "temperature1", data.temperature1)) {
-    return false;
-  }
-  if (!setFloatValue(basePath + "temperature2", data.temperature2)) {
-    return false;
-  }
-  if (!setFloatValue(basePath + "temperature3", data.temperature3)) {
-    return false;
-  }
-  if (!setFloatValue(basePath + "distance", data.distance)) {
-    return false;
-  }
+
+  if (!setFloatValue(basePath + "temperature1", data.temperature1)) return false;
+  if (!setFloatValue(basePath + "temperature2", data.temperature2)) return false;
+  if (!setFloatValue(basePath + "temperature3", data.temperature3)) return false;
+  if (!setFloatValue(basePath + "distance", data.distance))         return false;
+
 
   Serial.println("Data saved to firebase.");
   return true;
